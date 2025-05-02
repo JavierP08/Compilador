@@ -48,10 +48,11 @@ char classify(char currentCh){
 }
 
 bool Acceptance(int state){
-    if(state > 1 && state < 7){
-        return true;
+    if(state == 0 || state == 1 || state == 7){
+        return false;
     }
-    return false;
+
+    return true;
 }
 
 bool Error(int state){
@@ -61,51 +62,12 @@ bool Error(int state){
     return false;
 }
 
-bool Advance(int state, char currentCh){
-    if(state > 1 || state <= 7){
-        return false;
-    }
-    return true;
-}
-
 void recordToken(char palabra[200], FILE* tokenFile){
     char token[20];
     sprintf(token, "<%s>", palabra);
     
     fprintf(tokenFile, "%s\n", token);
 }
-
-/*int main(){
-    //Se abre el archivo a analizar y crear archivo de tokens
-    FILE *processFile;
-    FILE *tokenFile;
-    processFile = fopen("example.txt", "r");
-    tokenFile = fopen("tokens.txt", "w");
-
-    //Se establece la tabla de estados
-    StartTable();
-
-    //Se obtiene el primer char del archivo
-    char currentCh = fgetc(processFile);
-
-    while(numero < 5){
-        int state = 0;  //start 
-        char palabra[200] = "";
-        int index = 0;
-
-        while(!Acceptance(state) && !Error(state)){
-            char ch = classify(currentCh);
-            state = TT[state][ch];
-            printf("Current state: %d", state);
-
-            if(Advance(state, currentCh)){
-                palabra[index++] = currentCh;
-                currentCh = fgetc(processFile);
-            }
-
-        }
-    }
-}*/
 
 int main(){
     FILE *processFile;
@@ -117,32 +79,39 @@ int main(){
 
     char currentCh = fgetc(processFile);
 
-    int state = 0;  /* start */
-    char palabra[200] = "";
-    int index = 0;
-
     while (currentCh != EOF)
     {
+        int state = 0;  /* start */
+        char palabra[200] = "";
+        int index = 0;
+
         if(currentCh == '\t'){
             currentCh = fgetc(processFile);
         }
-        printf("Current state: %d, Current char: %c, Current word: %s\n", state, currentCh, palabra);
 
-        char ch = classify(currentCh);
-        state = TT[state][ch];
-        palabra[index++] = currentCh;
+        while (!Acceptance(state) && !Error(state)){
+            char ch = classify(currentCh);
+            state = TT[state][ch];
+
+            printf("State: %d\n", state);
+
+            palabra[index++] = currentCh;
+
+            currentCh = fgetc(processFile);
+
+        }
 
         if(Acceptance(state)){
             palabra[index] = '\0';
             recordToken(palabra, tokenFile);
             palabra[0] = '\0';
             index = 0;
+        }else if(Error(state)){
+            printf("Error state");
         }
 
-        currentCh = fgetc(processFile);
+        
     }
-
-    recordToken(palabra, tokenFile);
 
     fclose(processFile);
     fclose(tokenFile);
