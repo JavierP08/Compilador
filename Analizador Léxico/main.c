@@ -69,6 +69,22 @@ void recordToken(char palabra[200], FILE* tokenFile){
     fprintf(tokenFile, "%s\n", token);
 }
 
+bool Advance(int state, char currentCh){
+    char ch = classify(currentCh);
+    if ((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
+        return true;
+    }
+    return false;
+}
+bool Advance(int state, char currentCh){
+    char ch = classify(currentCh);
+    if ((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
+        return true;
+    }
+    return false;
+}
+
+
 int main(){
     FILE *processFile;
     FILE *tokenFile;
