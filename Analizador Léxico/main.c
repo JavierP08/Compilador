@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <string.h>
 
-#define NUM_STATES 7
-#define NUM_CHAR 9
+#define NUM_STATES 10
+#define NUM_CHAR 12
 
 int TT[NUM_STATES][NUM_CHAR]; // Tabla de transiciones
 
@@ -12,7 +13,7 @@ char PR[15][10] = {
     "class", "struct", "def", 
     "void", "int", "float",
     "double", "char", "bool",
-    "long", "string",
+    "long", "string", "short",
 }; //Tabla de palabras reservadas
 
 void StartTable(){
@@ -23,6 +24,9 @@ void StartTable(){
     TT[0]['}'] = 4;
     TT[0]['('] = 5;
     TT[0][')'] = 6;
+    TT[0]['<'] = 7;
+    TT[0]['>'] = 8;
+    TT[0]['#'] = 9;
     TT[0]['b'] = 0;
 
     TT[1]['l'] = 1;
@@ -32,6 +36,9 @@ void StartTable(){
     TT[1]['}'] = 2;
     TT[1]['('] = 2;
     TT[1][')'] = 2;
+    TT[1]['<'] = 2;
+    TT[1]['>'] = 2;
+    TT[1]['#'] = 2;
     TT[1]['b'] = 2;
 }
 
@@ -48,7 +55,7 @@ char classify(char currentCh){
 }
 
 bool Acceptance(int state){
-    if(state == 0 || state == 1 || state == 7){
+    if(state == 0 || state == 1 || state == 10){
         return false;
     }
 
@@ -56,7 +63,15 @@ bool Acceptance(int state){
 }
 
 bool Error(int state){
-    if(state == 7){
+    if(state == 10){
+        return true;
+    }
+    return false;
+}
+
+bool Advance(int state, char currentCh){
+    char ch = classify(currentCh);
+    if ((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
         return true;
     }
     return false;
@@ -67,21 +82,6 @@ void recordToken(char palabra[200], FILE* tokenFile){
     sprintf(token, "<%s>", palabra);
     
     fprintf(tokenFile, "%s\n", token);
-}
-
-bool Advance(int state, char currentCh){
-    char ch = classify(currentCh);
-    if ((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
-        return true;
-    }
-    return false;
-}
-bool Advance(int state, char currentCh){
-    char ch = classify(currentCh);
-    if ((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
-        return true;
-    }
-    return false;
 }
 
 
@@ -101,19 +101,24 @@ int main(){
         char palabra[200] = "";
         int index = 0;
 
-        if(currentCh == '\t'){
+        if(currentCh == '\t' || currentCh == ' ' || currentCh == '\n'){
             currentCh = fgetc(processFile);
         }
 
         while (!Acceptance(state) && !Error(state)){
             char ch = classify(currentCh);
             state = TT[state][ch];
-
-            printf("State: %d\n", state);
-
-            palabra[index++] = currentCh;
-
-            currentCh = fgetc(processFile);
+            
+            if(Advance(state, currentCh)){
+                printf("Estoy en mi advance state\n");
+                palabra[index++] = currentCh;
+                currentCh = fgetc(processFile);
+            }else if(classify(currentCh) == 'b'){
+                currentCh = fgetc(processFile);
+            }else{
+                palabra[index++] = currentCh;
+                currentCh = fgetc(processFile);
+            }
 
         }
 
