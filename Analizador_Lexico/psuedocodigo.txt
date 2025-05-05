@@ -1,0 +1,29 @@
+processFile = archivo_a_procesar()
+tokenFile = archivo_para_guardarIds()
+
+currentChar = first_char()
+
+while(!EOF){
+    state = 0
+    palabra = ""
+
+    while(!Acceptance(state) and !Error){
+        clasificacion = classify(currentChar)
+        state = TablaTransiciones[state][clasificacion]
+
+        if(Advance(state, clasificacion)){
+            palabra = palabra + currentChar
+            currentChar = next_char()
+        }else{
+            if(clasificacion = blank_space){
+                currentChar = next_char()
+            }
+        }
+    }
+
+    if(Acceptance(state)){
+        recordToke(palabra)
+    }else{
+        error_message()
+    }
+}

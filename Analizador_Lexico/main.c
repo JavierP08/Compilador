@@ -4,8 +4,8 @@
 #include <ctype.h>
 #include <string.h>
 
-#define NUM_STATES 10
-#define NUM_CHAR 12
+#define NUM_STATES 12
+#define NUM_CHAR 14
 #define MAX 100
 
 int TT[NUM_STATES][NUM_CHAR]; // Tabla de transiciones
@@ -16,14 +16,15 @@ char* TokenIds[] = {
     "float", "double", "char",
     "bool", "long", "string",
     "{", "}", "(", ")", "<", ">",
-    "#"
+    "#", ";", ":"
 }; // Tabla de tokens
 
 int TokenIdsNums[] = {
     1, 2, 3, 4, 5,
     6, 7, 8, 9, 10,
     11, 12, 13, 14, 15,
-    16, 17, 18, 19
+    16, 17, 18, 19, 20,
+    21
 }; // Tabla de ids de los tokens
 
 char* identifierTable[MAX]; // tabla de los identificadores
@@ -32,8 +33,15 @@ int totalOfIdentifiers = 0; // número de identificadores obtenidos
 
 // Función que inicia la tabla de transiciones
 void StartTable(){
+
+    for (int i = 0; i < NUM_STATES; i++) {
+        for (int j = 0; j < NUM_CHAR; j++) {
+            TT[i][j] = 10;
+        }
+    }
+
     TT[0]['l'] = 1;
-    TT[0]['d'] = 7;
+    TT[0]['d'] = 12;
     TT[0]['_'] = 1;
     TT[0]['{'] = 3;
     TT[0]['}'] = 4;
@@ -42,6 +50,8 @@ void StartTable(){
     TT[0]['<'] = 7;
     TT[0]['>'] = 8;
     TT[0]['#'] = 9;
+    TT[0][';'] = 10;
+    TT[0][':'] = 11;
     TT[0]['b'] = 0;
 
     TT[1]['l'] = 1;
@@ -54,6 +64,8 @@ void StartTable(){
     TT[1]['<'] = 2;
     TT[1]['>'] = 2;
     TT[1]['#'] = 2;
+    TT[1][';'] = 2;
+    TT[1][':'] = 2;
     TT[1]['b'] = 2;
 }
 
@@ -84,7 +96,6 @@ int getTokenId(char* currentToken){
 }
 
 int getExistingIdentifier(char* currentWord) {
-    printf("Total de identificadores: %d\n Identificador buscando: %s\n\n", totalOfIdentifiers, currentWord);
     for (int i = 0; i < totalOfIdentifiers; i++) {
         if (strcmp(identifierTable[i], currentWord) == 0) {
             return identifierTableNum[i];
@@ -115,17 +126,19 @@ void recordToken(char palabra[200], FILE* tokenFile){
 
     if(id == 20){
         int idIdentifier = insertIdentifier(palabra);
-        sprintf(token, "<%d, %d>", id, idIdentifier);
+        //sprintf(token, "<%d, %d>", id, idIdentifier);
+        sprintf(token, "<%s>", palabra);
         fprintf(tokenFile, "%s\n", token);
     }else{
-        sprintf(token, "<%d>", id);
+        //sprintf(token, "<%d>", id);
+        sprintf(token, "<%s>", palabra);
         fprintf(tokenFile, "%s\n", token);
     }
 }
 
 // Saber si el estado acutal es de aceptación
 bool Acceptance(int state){
-    if(state == 0 || state == 1 || state == 10){
+    if(state == 0 || state == 1 || state == 12){
         return false;
     }
 
@@ -134,16 +147,15 @@ bool Acceptance(int state){
 
 // Saber si el estado actual es de error
 bool Error(int state){
-    if(state == 10){
+    if(state == 12){
         return true;
     }
     return false;
 }
 
 // Saber si en el estado actual puede proseguir a guardar el caracter
-bool Advance(int state, char currentCh){
-    char ch = classify(currentCh);
-    if ((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
+bool Advance(int state, char ch){
+    if((ch == 'l' || ch == 'd')){
         return true;
     }
     return false;
@@ -166,24 +178,18 @@ int main(){
         char palabra[200] = "";
         int index = 0;
 
-        if(currentCh == '\t' || currentCh == ' ' || currentCh == '\n'){
-            currentCh = fgetc(processFile);
-        }
-
         while (!Acceptance(state) && !Error(state)){
             char ch = classify(currentCh);
             state = TT[state][ch];
-            
-            if(Advance(state, currentCh)){
+
+            if(Advance(state, ch)){
                 palabra[index++] = currentCh;
-                currentCh = fgetc(processFile);
-            }else if(classify(currentCh) == 'b'){
                 currentCh = fgetc(processFile);
             }else{
-                palabra[index++] = currentCh;
-                currentCh = fgetc(processFile);
+                if(ch == 'b'){
+                    currentCh = fgetc(processFile);
+                }
             }
-
         }
 
         if(Acceptance(state)){
