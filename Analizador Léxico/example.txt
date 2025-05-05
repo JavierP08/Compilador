@@ -1,1 +1,3 @@
-hola ()
+int main(){
+    int num
+}
