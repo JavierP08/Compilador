@@ -4,8 +4,8 @@
 #include <ctype.h>
 #include <string.h>
 
-#define NUM_STATES 12
-#define NUM_CHAR 14
+#define NUM_STATES 13
+#define NUM_CHAR 128
 #define MAX 100
 
 int TT[NUM_STATES][NUM_CHAR]; // Tabla de transiciones
@@ -36,7 +36,7 @@ void StartTable(){
 
     for (int i = 0; i < NUM_STATES; i++) {
         for (int j = 0; j < NUM_CHAR; j++) {
-            TT[i][j] = 10;
+            TT[i][j] = 12;
         }
     }
 
@@ -81,7 +81,6 @@ char classify(char currentCh){
     } else if(isspace(currentCh)) {
         return 'b';
     }
-
     return currentCh;
 }
 
@@ -92,7 +91,7 @@ int getTokenId(char* currentToken){
             return TokenIdsNums[i];
         }
     }
-    return 20;
+    return 22;
 }
 
 int getExistingIdentifier(char* currentWord) {
@@ -124,14 +123,14 @@ void recordToken(char palabra[200], FILE* tokenFile){
     char token[20];
     int id = getTokenId(palabra);
 
-    if(id == 20){
+    if(id == 22){
         int idIdentifier = insertIdentifier(palabra);
-        //sprintf(token, "<%d, %d>", id, idIdentifier);
-        sprintf(token, "<%s>", palabra);
+        sprintf(token, "<%d,%d>", id, idIdentifier);
+        //sprintf(token, "<%s>", palabra);
         fprintf(tokenFile, "%s\n", token);
     }else{
-        //sprintf(token, "<%d>", id);
-        sprintf(token, "<%s>", palabra);
+        sprintf(token, "<%d>", id);
+        //sprintf(token, "<%s>", palabra);
         fprintf(tokenFile, "%s\n", token);
     }
 }
@@ -155,7 +154,7 @@ bool Error(int state){
 
 // Saber si en el estado actual puede proseguir a guardar el caracter
 bool Advance(int state, char ch){
-    if((ch == 'l' || ch == 'd')){
+    if((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
         return true;
     }
     return false;
@@ -165,7 +164,7 @@ bool Advance(int state, char ch){
 int main(){
     FILE *processFile;
     FILE *tokenFile;
-    processFile = fopen("example.txt", "r");
+    processFile = fopen("Episodio.cpp", "r");
     tokenFile = fopen("tokens.txt", "w");
 
     StartTable();
@@ -181,24 +180,27 @@ int main(){
         while (!Acceptance(state) && !Error(state)){
             char ch = classify(currentCh);
             state = TT[state][ch];
-
-            if(Advance(state, ch)){
+            
+            if(ch == 'b'){
+                currentCh = fgetc(processFile);
+            }else if(Advance(state, ch)){
                 palabra[index++] = currentCh;
                 currentCh = fgetc(processFile);
-            }else{
-                if(ch == 'b'){
-                    currentCh = fgetc(processFile);
-                }
             }
         }
 
         if(Acceptance(state)){
-            palabra[index] = '\0';
-            recordToken(palabra, tokenFile);
-            palabra[0] = '\0';
-            index = 0;
+            if(state > 2 && state < 12){
+                palabra[index++] = currentCh;
+                palabra[index] = '\0';
+                recordToken(palabra, tokenFile);
+                currentCh = fgetc(processFile);
+            }else{
+                palabra[index] = '\0';
+                recordToken(palabra, tokenFile);
+            }
         }else if(Error(state)){
-            printf("Error state");
+            currentCh = fgetc(processFile);
         }
 
         
