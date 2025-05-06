@@ -162,59 +162,55 @@ bool Advance(int state, char ch){
 
 // Main del analizador léxico
 int main(){
-    // Se abren los archivos
-    // proceesFile = Archivo por procesar y revisar obtener los tokens
-    // tokenFile = Se insertaran los tokens ids
     FILE *processFile;
     FILE *tokenFile;
-    processFile = fopen("Episodio.cpp", "r");
+    processFile = fopen("./casos_de_prueba/test_case3.java", "r");
     tokenFile = fopen("tokens.txt", "w");
+
+    if (!processFile || !tokenFile) {
+        perror("Error al abrir los archivos");
+        return 1;
+    }
 
     StartTable();
 
-    // Se necesita obtener el primer carácter del archivo
-    char currentCh = fgetc(processFile);
+    int currentCh = fgetc(processFile);
 
-    // Ciclo while que sigue hasta que termine el archivo
     while (currentCh != EOF)
     {
-        int state = 0;  /* start */
+        int state = 0;
         char palabra[200] = "";
         int index = 0;
 
-        // Ciclo while que sigue hasta que el estado sea aceptor o erroneo
-        while (!Acceptance(state) && !Error(state)){
+        while (!Acceptance(state) && !Error(state)) {
             char ch = classify(currentCh);
             state = TT[state][ch];
-            
-            if(ch == 'b'){
+
+            if (ch == 'b') {
                 currentCh = fgetc(processFile);
-            }else if(Advance(state, ch)){
+                if (currentCh == EOF) break;
+            } else if (Advance(state, ch)) {
                 palabra[index++] = currentCh;
                 currentCh = fgetc(processFile);
+                if (currentCh == EOF) break;
+            } else {
+                palabra[index++] = currentCh;
+                currentCh = fgetc(processFile);
+                if (currentCh == EOF) break;
             }
         }
 
-        // Si el estado es aceptor se guardara el carcter especial o la palabra acumulada
-        if(Acceptance(state)){
-            if(state > 2 && state < 12){
-                palabra[index++] = currentCh;
-                palabra[index] = '\0';
-                recordToken(palabra, tokenFile);
-                currentCh = fgetc(processFile);
-            }else{
-                palabra[index] = '\0';
-                recordToken(palabra, tokenFile);
-            }
-        // Si es estado de error seguira con el siguiente caracter sin guardar
-        }else if(Error(state)){
+        if (Acceptance(state)) {
+            palabra[index] = '\0';
+            recordToken(palabra, tokenFile);
+        } else if (Error(state)) {
             currentCh = fgetc(processFile);
         }
 
-        
+        if (currentCh == EOF) break;
     }
 
-    // Se cierran los archivos
     fclose(processFile);
     fclose(tokenFile);
+    return 0;
 }
