@@ -94,6 +94,7 @@ int getTokenId(char* currentToken){
     return 22;
 }
 
+// Se obtiene el id del identificador que ya esta en la tabla de simbolos
 int getExistingIdentifier(char* currentWord) {
     for (int i = 0; i < totalOfIdentifiers; i++) {
         if (strcmp(identifierTable[i], currentWord) == 0) {
@@ -103,6 +104,7 @@ int getExistingIdentifier(char* currentWord) {
     return -1;
 }
 
+// Se inserta un nuevo identificador a la tabla de simbolos
 int insertIdentifier(char* currentWord) {
     int numberId = getExistingIdentifier(currentWord);
     if (numberId == -1) {
@@ -126,11 +128,9 @@ void recordToken(char palabra[200], FILE* tokenFile){
     if(id == 22){
         int idIdentifier = insertIdentifier(palabra);
         sprintf(token, "<%d,%d>", id, idIdentifier);
-        //sprintf(token, "<%s>", palabra);
         fprintf(tokenFile, "%s\n", token);
     }else{
         sprintf(token, "<%d>", id);
-        //sprintf(token, "<%s>", palabra);
         fprintf(tokenFile, "%s\n", token);
     }
 }
@@ -162,6 +162,9 @@ bool Advance(int state, char ch){
 
 // Main del analizador léxico
 int main(){
+    // Se abren los archivos
+    // proceesFile = Archivo por procesar y revisar obtener los tokens
+    // tokenFile = Se insertaran los tokens ids
     FILE *processFile;
     FILE *tokenFile;
     processFile = fopen("Episodio.cpp", "r");
@@ -169,14 +172,17 @@ int main(){
 
     StartTable();
 
+    // Se necesita obtener el primer carácter del archivo
     char currentCh = fgetc(processFile);
 
+    // Ciclo while que sigue hasta que termine el archivo
     while (currentCh != EOF)
     {
         int state = 0;  /* start */
         char palabra[200] = "";
         int index = 0;
 
+        // Ciclo while que sigue hasta que el estado sea aceptor o erroneo
         while (!Acceptance(state) && !Error(state)){
             char ch = classify(currentCh);
             state = TT[state][ch];
@@ -189,6 +195,7 @@ int main(){
             }
         }
 
+        // Si el estado es aceptor se guardara el carcter especial o la palabra acumulada
         if(Acceptance(state)){
             if(state > 2 && state < 12){
                 palabra[index++] = currentCh;
@@ -199,6 +206,7 @@ int main(){
                 palabra[index] = '\0';
                 recordToken(palabra, tokenFile);
             }
+        // Si es estado de error seguira con el siguiente caracter sin guardar
         }else if(Error(state)){
             currentCh = fgetc(processFile);
         }
@@ -206,6 +214,7 @@ int main(){
         
     }
 
+    // Se cierran los archivos
     fclose(processFile);
     fclose(tokenFile);
 }
