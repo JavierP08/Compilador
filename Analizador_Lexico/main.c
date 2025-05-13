@@ -5,7 +5,7 @@
 #include <string.h>
 
 #define NUM_STATES 13
-#define NUM_CHAR 128
+#define NUM_CHAR 255
 #define MAX 100
 
 int TT[NUM_STATES][NUM_CHAR]; // Tabla de transiciones
@@ -78,7 +78,7 @@ char classify(char currentCh){
         return 'l';
     } else if (isdigit(currentCh)) {
         return 'd';
-    } else if(isspace(currentCh)) {
+    } else if(isspace(currentCh) || currentCh < 0) {
         return 'b';
     }
     return currentCh;
