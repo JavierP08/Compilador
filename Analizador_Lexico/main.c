@@ -167,7 +167,7 @@ int main(){
     // tokenFile = Se insertaran los tokens ids
     FILE *processFile;
     FILE *tokenFile;
-    processFile = fopen("./casos_de_prueba/test_case1.cpp", "r");
+    processFile = fopen("./casos_de_prueba/ExampleC.txt", "r");
     tokenFile = fopen("tokens.txt", "w");
 
     StartTable();
