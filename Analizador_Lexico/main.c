@@ -11,13 +11,11 @@
 int TT[NUM_STATES][NUM_CHAR]; // Tabla de transiciones
 
 char* TokenIds[] = {
-    "class", "main",
-    "{", "}", "(", ")"
+    "class", "main","{", "}", "(", ")"
 }; // Tabla de tokens (MODIFICARLA)
 
 int TokenIdsNums[] = {
-    1, 2, 3, 4, 5,
-    6
+    1, 2, 3, 4, 5, 6
 }; // Tabla de ids de los tokens (USARLA NUEVA TABLA DE IDS)
 
 char* identifierTable[MAX]; // tabla de los identificadores
@@ -46,7 +44,6 @@ void StartTable(){
     TT[0][';'] = 10;
     TT[0][':'] = 11;*/
     TT[0]['b'] = 0;
-    TT[0][7] = 7; // rare char
 
     TT[1]['l'] = 1;
     TT[1]['d'] = 1;
@@ -61,7 +58,6 @@ void StartTable(){
     TT[1][';'] = 2;
     TT[1][':'] = 2;*/
     TT[1]['b'] = 2;
-    TT[1][7] = 7; // rare char
 }
 
 // Función que ayuda a clasificar entre
@@ -132,31 +128,36 @@ void recordToken(char palabra[200], FILE* tokenFile){
 
 // Saber si el estado acutal es de aceptación
 bool Acceptance(int state){
-    /*if(state == 0 || state == 1 || state == 7){ //CAMBIAR ESTADO DE ERROR
+    if(state == 0 || state == 1 || state == 7){
         return false;
     }
 
-    return true;*/
-    return state >=2 && state<= 6;
+    return true;
+    //return state >=2 && state<= 6;
 }
 
 // Saber si el estado actual es de error
 bool Error(int state){
-    /*if(state == 7){
+    if(state == 7){
         return true;
     }
-    return false;*/
-    return state == 7;
+    return false;
+    //return state == 7;
 }
+
+/*bool isTokenSpecial(char ch) {
+    return ch == '{' || ch == '}' || ch == '(' || ch == ')';
+}*/
 
 // Saber si en el estado actual puede proseguir a guardar el caracter
 bool Advance(int state, char ch){
-    /*if((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
+    if((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
         return true;
     }
-    return false;*/
-    return (ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1);
+    return false;
 }
+
+
 
 // Main del analizador léxico
 int main(){
@@ -165,7 +166,7 @@ int main(){
     // tokenFile = Se insertaran los tokens ids
     FILE *processFile;
     FILE *tokenFile;
-    processFile = fopen("./casos_de_prueba/ExampleC.txt", "r");
+    processFile = fopen("./casos_de_prueba/Example.txt", "r");
     tokenFile = fopen("tokens.txt", "w");
 
     StartTable();
