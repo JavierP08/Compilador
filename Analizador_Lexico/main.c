@@ -4,28 +4,21 @@
 #include <ctype.h>
 #include <string.h>
 
-#define NUM_STATES 13
+#define NUM_STATES 8   //Restar los estados que no hacen falta +1
 #define NUM_CHAR 255
 #define MAX 100
 
 int TT[NUM_STATES][NUM_CHAR]; // Tabla de transiciones
 
 char* TokenIds[] = {
-    "class", "struct", "def",
-    "void", "short", "int",
-    "float", "double", "char",
-    "bool", "long", "string",
-    "{", "}", "(", ")", "<", ">",
-    "#", ";", ":"
-}; // Tabla de tokens
+    "class", "main",
+    "{", "}", "(", ")"
+}; // Tabla de tokens (MODIFICARLA)
 
 int TokenIdsNums[] = {
     1, 2, 3, 4, 5,
-    6, 7, 8, 9, 10,
-    11, 12, 13, 14, 15,
-    16, 17, 18, 19, 20,
-    21
-}; // Tabla de ids de los tokens
+    6
+}; // Tabla de ids de los tokens (USARLA NUEVA TABLA DE IDS)
 
 char* identifierTable[MAX]; // tabla de los identificadores
 int identifierTableNum[MAX]; // tabla de ids de los identificadores 
@@ -36,23 +29,24 @@ void StartTable(){
 
     for (int i = 0; i < NUM_STATES; i++) {
         for (int j = 0; j < NUM_CHAR; j++) {
-            TT[i][j] = 12;
+            TT[i][j] = 7;
         }
     }
 
     TT[0]['l'] = 1;
-    TT[0]['d'] = 12;
+    TT[0]['d'] = 7;
     TT[0]['_'] = 1;
     TT[0]['{'] = 3;
     TT[0]['}'] = 4;
     TT[0]['('] = 5;
     TT[0][')'] = 6;
-    TT[0]['<'] = 7;
+    /*TT[0]['<'] = 7;
     TT[0]['>'] = 8;
     TT[0]['#'] = 9;
     TT[0][';'] = 10;
-    TT[0][':'] = 11;
+    TT[0][':'] = 11;*/
     TT[0]['b'] = 0;
+    TT[0][7] = 7; // rare char
 
     TT[1]['l'] = 1;
     TT[1]['d'] = 1;
@@ -61,12 +55,13 @@ void StartTable(){
     TT[1]['}'] = 2;
     TT[1]['('] = 2;
     TT[1][')'] = 2;
-    TT[1]['<'] = 2;
+    /*TT[1]['<'] = 2;
     TT[1]['>'] = 2;
     TT[1]['#'] = 2;
     TT[1][';'] = 2;
-    TT[1][':'] = 2;
+    TT[1][':'] = 2;*/
     TT[1]['b'] = 2;
+    TT[1][7] = 7; // rare char
 }
 
 // Función que ayuda a clasificar entre
@@ -91,7 +86,7 @@ int getTokenId(char* currentToken){
             return TokenIdsNums[i];
         }
     }
-    return 22;
+    return 7; //MODIFICAR POR EL TOKEN ID DE LOS IDENTIFICADORES DE NUESTRA NUEVA TABLA DE TRANCISIONES
 }
 
 // Se obtiene el id del identificador que ya esta en la tabla de simbolos
@@ -101,7 +96,7 @@ int getExistingIdentifier(char* currentWord) {
             return identifierTableNum[i];
         }
     }
-    return -1;
+    return -1; 
 }
 
 // Se inserta un nuevo identificador a la tabla de simbolos
@@ -125,7 +120,7 @@ void recordToken(char palabra[200], FILE* tokenFile){
     char token[20];
     int id = getTokenId(palabra);
 
-    if(id == 22){
+    if(id == 7){ //CAMBIAR AL ID DE LOS IDENTIFICADORES DE LA NUEVA TABLA
         int idIdentifier = insertIdentifier(palabra);
         sprintf(token, "<%d,%d>", id, idIdentifier);
         fprintf(tokenFile, "%s\n", token);
@@ -137,27 +132,30 @@ void recordToken(char palabra[200], FILE* tokenFile){
 
 // Saber si el estado acutal es de aceptación
 bool Acceptance(int state){
-    if(state == 0 || state == 1 || state == 12){
+    /*if(state == 0 || state == 1 || state == 7){ //CAMBIAR ESTADO DE ERROR
         return false;
     }
 
-    return true;
+    return true;*/
+    return state >=2 && state<= 6;
 }
 
 // Saber si el estado actual es de error
 bool Error(int state){
-    if(state == 12){
+    /*if(state == 7){
         return true;
     }
-    return false;
+    return false;*/
+    return state == 7;
 }
 
 // Saber si en el estado actual puede proseguir a guardar el caracter
 bool Advance(int state, char ch){
-    if((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
+    /*if((ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1)){
         return true;
     }
-    return false;
+    return false;*/
+    return (ch == 'l' || ch == 'd' || ch == '_') && (state == 0 || state == 1);
 }
 
 // Main del analizador léxico
@@ -198,7 +196,7 @@ int main(){
 
         // Si el estado es aceptor se guardara el carcter especial o la palabra acumulada
         if(Acceptance(state)){
-            if(state > 2 && state < 12){
+            if(state > 2 && state < 7){ //MODIFICAR EL ESTADO DE ERROR
                 palabra[index++] = currentCh;
                 palabra[index] = '\0';
                 recordToken(palabra, tokenFile);
