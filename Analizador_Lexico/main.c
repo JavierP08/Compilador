@@ -112,7 +112,7 @@ bool Advance(int state, char ch){
 }
 
 int main(){
-    FILE *processFile = fopen("./casos_de_prueba/ExampleC.txt", "r");
+    FILE *processFile = fopen("./casos_de_prueba/test_case3.java", "r");
     FILE *tokenFile = fopen("tokens.txt", "w");
 
     if (!processFile || !tokenFile) {
