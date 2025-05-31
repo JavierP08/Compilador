@@ -1,4 +1,4 @@
-class Animal {
+class Animal ¿ {
     int edad;
     char genero;
     void hacerSonido() {

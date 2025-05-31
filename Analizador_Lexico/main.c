@@ -11,20 +11,13 @@
 int TT[NUM_STATES][NUM_CHAR]; // Tabla de transiciones
 
 char* TokenIds[] = {
-    "class", "struct", "def",
-    "void", "short", "int",
-    "float", "double", "char",
-    "bool", "long", "string",
-    "{", "}", "(", ")", "<", ">",
-    "#", ";", ":"
-}; // Tabla de tokens
+    "class", "main", "{", "}", 
+    "(", ")"
+};
 
 int TokenIdsNums[] = {
     1, 2, 3, 4, 5,
-    6, 7, 8, 9, 10,
-    11, 12, 13, 14, 15,
-    16, 17, 18, 19, 20,
-    21
+    6
 }; // Tabla de ids de los tokens
 
 char* identifierTable[MAX]; // tabla de los identificadores
@@ -167,7 +160,7 @@ int main(){
     // tokenFile = Se insertaran los tokens ids
     FILE *processFile;
     FILE *tokenFile;
-    processFile = fopen("./casos_de_prueba/ExampleC.txt", "r");
+    processFile = fopen("./casos_de_prueba/test_case1.cpp", "r");
     tokenFile = fopen("tokens.txt", "w");
 
     StartTable();
