@@ -1,0 +1,29 @@
+programa(token){
+    if(token == "class"){
+        clases(token)
+        programa(token)
+    }else if(token == "identificador"){
+        funciones(token)
+        variable(token)
+        programa(token)
+    }else{
+        Error()
+        return false
+    }
+    return true
+}
+
+archivoTokens = abrir_archivo("tokens.txt")
+token = leer_linea(archivoTokens)
+token = limpiar_token(token)
+
+while (!EOF){
+    token = leer_linea(archivoTokens)
+    token = limpiar_token(token)
+
+    resultado = programa(token)
+}
+
+cerrar(archivoTokens)
+
+
