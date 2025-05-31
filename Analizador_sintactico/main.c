@@ -211,6 +211,7 @@ bool match(int expected){
         char line[256];
         if(fgets(line, sizeof(line), file)){
             limpiarToken(line);
+            currentTokens = currentTokens + 1;
         }else{
             token = 0;
         }
@@ -220,12 +221,23 @@ bool match(int expected){
     return false;
 }
 
+int contarLineas() {
+    int totalTokens = 0;
+    char buffer[256];
+
+    while (fgets(buffer, sizeof(buffer), file)) {
+        totalTokens++;
+    }
+
+}
+
 int main() {
     char line[256];
 
     file = fopen("./test_case3.txt", "r");
     saveFile = fopen("SaveFile.txt", "w");
 
+    contarLineas();
     fgets(line, sizeof(line), file);
     limpiarToken(line);
 
