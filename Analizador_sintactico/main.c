@@ -306,21 +306,24 @@ int main() {
     fgets(ruta, sizeof(ruta), stdin);
     ruta[strcspn(ruta, "\n")] = '\0';
 
+    file = fopen(ruta, "r");
     contarLineas();
+    rewind(file); 
     fgets(line, sizeof(line), file);
     limpiarToken(line);
 
     programa(token);
 
-    printf("El código a analizar es un código: ");
     if(banderaOOP && banderaPro){
-        printf("Hibrido");
-    }else if(banderaOOP){
-        printf("Orientado a Objetos");
+        printf("Es hibrido\n");
+    }
+
+    if(banderaOOP){
+        printf("Es oop\n");
     }else if(banderaPro){
-        printf("Procedimental");
+        printf("Es procedimental\n");
     }else{
-        printf("Texto plano");
+        printf("Es texto\n");
     }
 
     fclose(file);
