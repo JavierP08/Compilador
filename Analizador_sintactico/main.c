@@ -290,14 +290,12 @@ bool match(int expected){
 }
 
 // Para saber el numero de lineas en el archivo
-int contarLineas() {
-    int totalTokens = 0;
+void contarLineas() {
     char buffer[256];
 
     while (fgets(buffer, sizeof(buffer), file)) {
         totalTokens++;
     }
-
 }
 
 int main() {
