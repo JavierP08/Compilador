@@ -4,6 +4,8 @@
 #include <ctype.h>
 #include <string.h>
 
+// C requiere definir las funciones antes
+// debido a que se hacen llamada a ellas mismas
 bool programa();
 bool clases();
 bool clases_();
@@ -18,11 +20,10 @@ bool match(int expected);
 void limpiarToken(const char* line);
 void error_();
 
-
-char* TokenIds[] = {
-    "class", "main", "{", "}", 
-    "(", ")"
-};
+// Valores globales:
+//   banderas
+//   tokens para calcular porcentaje
+//   archivos a utilizar
 
 bool banderaOOP = false;
 bool banderaPro = false;
@@ -35,6 +36,15 @@ FILE* saveFile;
 
 int token = 0;
 
+
+/*
+Función para non-terminal programa
+<programa> → <clases> <programa>  
+            | <funciones> <programa>
+            | <variable> <programa>
+            | ε
+
+*/
 bool programa(){
     if(token == 1){
         if(!clases(token)) return false;
@@ -58,6 +68,10 @@ bool programa(){
     }
 }
 
+/*
+Función para non-terminal clases
+<clases> →  class <variable> { <funciones> } <clases'>
+*/
 bool clases(){
     if(token == 1){
         if(!match(1)) return false;
@@ -72,6 +86,12 @@ bool clases(){
     }
 }
 
+/*
+Función para non-terminal clases'
+<clases’> → <clases> 
+          | <variable> main () { <instrucciones> }
+          | ε
+*/
 bool clases_(){
     if(token == 1){
         if(!clases(token)) return false;
@@ -91,6 +111,10 @@ bool clases_(){
     }
 }
 
+/*
+Función para non-terminal funciones
+<funciones> →  <variable> (<variable>) { <instrucciones> } <funciones'>
+*/
 bool funciones(){
     if(token == 7){
         if(!variable(token)) return false;
@@ -107,6 +131,11 @@ bool funciones(){
     }
 }
 
+/*
+Función para non-terminal funciones'
+<funciones’> → <funciones> 
+            | ε
+*/
 bool funciones_(){
     if(token == 7){
         if(!funciones(token)) return false;
@@ -118,6 +147,13 @@ bool funciones_(){
     }
 }
 
+/*
+Funciones para non-terminal instrucciones
+<instrucciones>  →  <variable> { <instrucciones'> }
+                | <funciones>
+                | <contenido>
+                |  ε
+*/
 bool instrucciones(){
     if(token == 7){
         if(!variable(token)) return false;
@@ -136,6 +172,11 @@ bool instrucciones(){
     }
 }
 
+/*
+Funciones para non-terminal instrucciones'
+<instrucciones’> → { <instrucciones> }
+           |  ε
+*/
 bool instrucciones_(){
     if(token == 3){
         if(!instrucciones(token)) return false;
@@ -148,6 +189,12 @@ bool instrucciones_(){
     }
 }
 
+/*
+Funciones para non-terminal contenido
+<contenido> → <clases><contenido> 
+      | <funciones><contenido>
+      | ε
+*/
 bool contenido(){
     if(token == 1){
         if(!clases(token)) return false;
@@ -164,6 +211,10 @@ bool contenido(){
     }
 }
 
+/*
+Funciones para non-terminal variable
+<variable> →  identificador <variables> 
+*/
 bool variable(){
     if(token == 7){
         if(!match(7)) return false;
@@ -174,6 +225,11 @@ bool variable(){
     }
 }
 
+/*
+Funciones para non-terminal variable'
+<variable’> → <variable>
+  | ε
+*/
 bool variable_(){
     if(token == 7){
         if(!variable(token)) return false;
@@ -185,9 +241,19 @@ bool variable_(){
     }
 }
 
-
+// función para impresión del error
 void error_(){
     int porcentaje = (currentTokens / totalTokens) * 100;
+    printf("Estamos un %d por ciento seguros que el código es: ", porcentaje);
+    if(banderaOOP && banderaPro){
+        printf("Hibrido");
+    }else if(banderaOOP){
+        printf("Orientado a Objetos");
+    }else if(banderaPro){
+        printf("Procedimental");
+    }else{
+        printf("Texto plano");
+    }
 }
 
 void limpiarToken(const char* line) {
@@ -233,9 +299,11 @@ int contarLineas() {
 
 int main() {
     char line[256];
+    char ruta[256];
 
-    file = fopen("./test_case3.txt", "r");
-    saveFile = fopen("SaveFile.txt", "w");
+    printf("Ingresa la ruta del archivo de tokens a analizar: ");
+    fgets(ruta, sizeof(ruta), stdin);
+    ruta[strcspn(ruta, "\n")] = '\0';
 
     contarLineas();
     fgets(line, sizeof(line), file);
@@ -243,16 +311,15 @@ int main() {
 
     programa(token);
 
+    printf("El código a analizar es un código: ");
     if(banderaOOP && banderaPro){
-        printf("Es hibrido\n");
-    }
-
-    if(banderaOOP){
-        printf("Es oop\n");
+        printf("Hibrido");
+    }else if(banderaOOP){
+        printf("Orientado a Objetos");
     }else if(banderaPro){
-        printf("Es procedimental\n");
+        printf("Procedimental");
     }else{
-        printf("Es texto\n");
+        printf("Texto plano");
     }
 
     fclose(file);
