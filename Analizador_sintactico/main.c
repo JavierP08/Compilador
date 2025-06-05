@@ -256,6 +256,7 @@ void error_(){
     }
 }
 
+// Función para limpiar el string del token y solo obtener un número
 void limpiarToken(const char* line) {
     int j = 0;
     char clean[256];
@@ -272,6 +273,7 @@ void limpiarToken(const char* line) {
     sscanf(clean, "%d", &token);
 }
 
+// Función que hace le match con el token esperado y pasa al siguiente si es correcto
 bool match(int expected){
     if(token == expected){
         char line[256];
@@ -287,6 +289,7 @@ bool match(int expected){
     return false;
 }
 
+// Para saber el numero de lineas en el archivo
 int contarLineas() {
     int totalTokens = 0;
     char buffer[256];
