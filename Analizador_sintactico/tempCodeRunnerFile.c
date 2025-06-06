@@ -1,0 +1,1 @@
+fopen(ruta, "r");

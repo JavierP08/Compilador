@@ -32,7 +32,6 @@ int totalTokens = 0;
 int currentTokens = 0;
 
 FILE* file;
-FILE* saveFile;
 
 int token = 0;
 
@@ -327,5 +326,4 @@ int main() {
     }
 
     fclose(file);
-    fclose(saveFile);
 }

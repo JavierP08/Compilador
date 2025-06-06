@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#define NUM_STATES 13
+#define NUM_STATES 8
 #define NUM_CHAR 255
 #define MAX 100
 
@@ -29,23 +29,17 @@ void StartTable(){
 
     for (int i = 0; i < NUM_STATES; i++) {
         for (int j = 0; j < NUM_CHAR; j++) {
-            TT[i][j] = 12;
+            TT[i][j] = 7;
         }
     }
 
     TT[0]['l'] = 1;
-    TT[0]['d'] = 12;
+    TT[0]['d'] = 7;
     TT[0]['_'] = 1;
     TT[0]['{'] = 3;
     TT[0]['}'] = 4;
     TT[0]['('] = 5;
     TT[0][')'] = 6;
-    TT[0]['<'] = 7;
-    TT[0]['>'] = 8;
-    TT[0]['#'] = 9;
-    TT[0][';'] = 10;
-    TT[0][':'] = 11;
-    TT[0]['b'] = 0;
 
     TT[1]['l'] = 1;
     TT[1]['d'] = 1;
@@ -54,12 +48,6 @@ void StartTable(){
     TT[1]['}'] = 2;
     TT[1]['('] = 2;
     TT[1][')'] = 2;
-    TT[1]['<'] = 2;
-    TT[1]['>'] = 2;
-    TT[1]['#'] = 2;
-    TT[1][';'] = 2;
-    TT[1][':'] = 2;
-    TT[1]['b'] = 2;
 }
 
 // Función que ayuda a clasificar entre
@@ -84,7 +72,7 @@ int getTokenId(char* currentToken){
             return TokenIdsNums[i];
         }
     }
-    return 22;
+    return 7;
 }
 
 // Se obtiene el id del identificador que ya esta en la tabla de simbolos
@@ -118,7 +106,7 @@ void recordToken(char palabra[200], FILE* tokenFile){
     char token[20];
     int id = getTokenId(palabra);
 
-    if(id == 22){
+    if(id == 7){
         int idIdentifier = insertIdentifier(palabra);
         sprintf(token, "<%d,%d>", id, idIdentifier);
         fprintf(tokenFile, "%s\n", token);
@@ -130,7 +118,7 @@ void recordToken(char palabra[200], FILE* tokenFile){
 
 // Saber si el estado acutal es de aceptación
 bool Acceptance(int state){
-    if(state == 0 || state == 1 || state == 12){
+    if(state == 0 || state == 1 || state == 7){
         return false;
     }
 
@@ -139,7 +127,7 @@ bool Acceptance(int state){
 
 // Saber si el estado actual es de error
 bool Error(int state){
-    if(state == 12){
+    if(state == 7){
         return true;
     }
     return false;
@@ -156,16 +144,16 @@ bool Advance(int state, char ch){
 // Main del analizador léxico
 int main(){
     char ruta[256];
-
+/*
     printf("Ingresa la ruta del archivo de tokens a analizar: ");
     fgets(ruta, sizeof(ruta), stdin);
-    ruta[strcspn(ruta, "\n")] = '\0';
+    ruta[strcspn(ruta, "\n")] = '\0';*/
     // Se abren los archivos
     // proceesFile = Archivo por procesar y revisar obtener los tokens
     // tokenFile = Se insertaran los tokens ids
     FILE *processFile;
     FILE *tokenFile;
-    processFile = ruta;
+    processFile = fopen("./casos_de_prueba/test_case1.cpp", "r");
     tokenFile = fopen("tokens.txt", "w");
 
     StartTable();
