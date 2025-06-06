@@ -253,6 +253,8 @@ void error_(){
     }else{
         printf("Texto plano");
     }
+    printf("\n");
+    exit(1);
 }
 
 // Función para limpiar el string del token y solo obtener un número
