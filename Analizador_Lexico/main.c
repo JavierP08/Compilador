@@ -40,6 +40,7 @@ void StartTable(){
     TT[0]['}'] = 4;
     TT[0]['('] = 5;
     TT[0][')'] = 6;
+    TT[0]['b'] = 0;
 
     TT[1]['l'] = 1;
     TT[1]['d'] = 1;
@@ -48,6 +49,8 @@ void StartTable(){
     TT[1]['}'] = 2;
     TT[1]['('] = 2;
     TT[1][')'] = 2;
+    TT[1]['b'] = 2;
+
 }
 
 // Función que ayuda a clasificar entre
@@ -144,16 +147,16 @@ bool Advance(int state, char ch){
 // Main del analizador léxico
 int main(){
     char ruta[256];
-/*
+
     printf("Ingresa la ruta del archivo de tokens a analizar: ");
     fgets(ruta, sizeof(ruta), stdin);
-    ruta[strcspn(ruta, "\n")] = '\0';*/
+    ruta[strcspn(ruta, "\n")] = '\0';
     // Se abren los archivos
     // proceesFile = Archivo por procesar y revisar obtener los tokens
     // tokenFile = Se insertaran los tokens ids
     FILE *processFile;
     FILE *tokenFile;
-    processFile = fopen("./casos_de_prueba/test_case1.cpp", "r");
+    processFile = fopen(ruta, "r");
     tokenFile = fopen("tokens.txt", "w");
 
     StartTable();

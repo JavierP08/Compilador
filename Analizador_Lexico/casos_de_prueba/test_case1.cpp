@@ -1,5 +1,5 @@
 class animal {
-    int funcion(){
+    int funcion(int numero){
         
     }
 };

@@ -46,8 +46,8 @@ Función para non-terminal programa
 */
 bool programa(){
     if(token == 1){
-        if(!clases(token)) return false;
         banderaOOP = true;
+        if(!clases(token)) return false;
         if(!programa(token)) return false;
         return true;
     }else if(token == 7){
@@ -280,7 +280,7 @@ bool match(int expected){
         char line[256];
         if(fgets(line, sizeof(line), file)){
             limpiarToken(line);
-            currentTokens = currentTokens + 1;
+            currentTokens++;
         }else{
             token = 0;
         }
